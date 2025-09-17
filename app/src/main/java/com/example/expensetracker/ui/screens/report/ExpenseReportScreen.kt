@@ -96,7 +96,7 @@ private fun shareReport(context: Context, expenses: List<Expense>) {
     intent.type = "*/*"
     val uris = arrayListOf(csvUri)
     expenses.forEach { expense ->
-        expense.receiptUri?.let { uriStr ->
+        expense.receiptPath?.let { uriStr ->
             val uri = Uri.parse(uriStr)
             uris.add(uri)
             context.grantUriPermission(context.packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)

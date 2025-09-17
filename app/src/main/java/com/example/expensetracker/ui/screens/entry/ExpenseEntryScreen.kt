@@ -1,5 +1,6 @@
 package com.example.expensetracker.ui.screens.entry
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.expensetracker.ui.components.AppScaffold  // Your custom AppScaffold
@@ -33,9 +35,18 @@ fun ExpenseEntryScreen(navController: NavController) {
     var showToast by remember { mutableStateOf(false) }
     var totalToday by remember { mutableStateOf(0.0) }
 
+    val context = LocalContext.current
+
     val fileLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> receiptUri = uri }
+        ActivityResultContracts.OpenDocument()  // Switch to OpenDocument for persistable URIs
+    ) { uri: Uri? ->
+        uri?.let {
+            // Grant persistent read permission
+            val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(it, takeFlags)
+            receiptUri = it
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.totalToday.collectLatest { totalToday = it ?: 0.0 }
@@ -78,7 +89,9 @@ fun ExpenseEntryScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(value = notes, onValueChange = { if (it.length <= 100) notes = it }, label = { Text("Notes") }, modifier = Modifier.fillMaxWidth())
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = { fileLauncher.launch("*/*") }) { Text("Upload Receipt (Image/PDF)") }
+                Button(onClick = { fileLauncher.launch(arrayOf("*/*")) }) {  // Launch with mime type for any file
+                    Text("Upload Receipt (Image/PDF)")
+                }
                 receiptUri?.let { Text("Selected: $it", color = MaterialTheme.colorScheme.secondary) }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {

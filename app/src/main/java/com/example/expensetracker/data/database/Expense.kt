@@ -16,7 +16,7 @@ data class Expense(
     val amount: Double,
     val category: String,
     val notes: String? = null,
-    val receiptUri: String? = null,  // Updated to store URI string
+    val receiptPath: String? = null,  // Updated: Stores internal file path as String
     val date: Long = System.currentTimeMillis()
 )
 
@@ -39,4 +39,3 @@ interface ExpenseDao {
 abstract class ExpenseDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
 }
-

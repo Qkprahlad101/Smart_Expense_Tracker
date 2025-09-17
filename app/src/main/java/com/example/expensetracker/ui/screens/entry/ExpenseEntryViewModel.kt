@@ -13,9 +13,9 @@ class ExpenseEntryViewModel(private val repository: ExpenseRepository) : ViewMod
     val totalToday: Flow<Double?> = repository.getTotalForToday()
 
     fun addExpense(title: String, amount: Double, category: String, notes: String?, receipt: String?) {
-        if (title.isBlank() || amount <= 0) return // Validation
+        if (title.isBlank() || amount <= 0) return
         viewModelScope.launch {
-            repository.addExpense(Expense(title = title, amount = amount, category = category, notes = notes))
+            repository.addExpense(Expense(title = title, amount = amount, category = category, notes = notes, receiptPath = receipt))
         }
     }
 }
