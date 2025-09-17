@@ -15,7 +15,7 @@ class ExpenseEntryViewModel(private val repository: ExpenseRepository) : ViewMod
     fun addExpense(title: String, amount: Double, category: String, notes: String?, receipt: String?) {
         if (title.isBlank() || amount <= 0) return // Validation
         viewModelScope.launch {
-            repository.addExpense(Expense(title = title, amount = amount, category = category, notes = notes, receiptImage = receipt))
+            repository.addExpense(Expense(title = title, amount = amount, category = category, notes = notes))
         }
     }
 }

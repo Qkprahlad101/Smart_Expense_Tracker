@@ -16,7 +16,7 @@ data class Expense(
     val amount: Double,
     val category: String,
     val notes: String? = null,
-    val receiptImage: String? = null,
+    val receiptUri: String? = null,  // Updated to store URI string
     val date: Long = System.currentTimeMillis()
 )
 

@@ -21,6 +21,23 @@ class ExpenseListViewModel(private val repository: ExpenseRepository) : ViewMode
         }
     }
 
+    fun getDateRange(preset: String): Pair<Long, Long> {
+        val calendar = Calendar.getInstance()
+        val end = calendar.timeInMillis + (24 * 60 * 60 * 1000)  // End of current day
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        var start = calendar.timeInMillis
+
+        when (preset) {
+            "This Week" -> calendar.add(Calendar.DAY_OF_YEAR, -7)
+            "This Month" -> calendar.add(Calendar.MONTH, -1)
+            else -> {}
+        }
+        start = calendar.timeInMillis
+        return start to end
+    }
+
     fun getTodayRange(): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.HOUR_OF_DAY, 0)
