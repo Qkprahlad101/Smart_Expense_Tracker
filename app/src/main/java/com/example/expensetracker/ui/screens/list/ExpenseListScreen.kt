@@ -23,7 +23,6 @@ import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.expensetracker.data.database.Expense
-import com.example.expensetracker.model.Category
 import com.example.expensetracker.model.DatePreset
 import com.example.expensetracker.ui.AppText
 import com.example.expensetracker.ui.components.AppScaffold
@@ -144,15 +143,12 @@ private fun ExpensePreviewDialog(expense: Expense, onDismiss: () -> Unit) {
         SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(expense.date))
     }
 
-    // Restore exact working logic: use receiptPath as parsable URI first, then as file path
     val previewUri: Uri? = remember(expense.receiptPath) {
         when {
             !expense.receiptPath.isNullOrBlank() -> {
-                // First branch: treat as parsable URI string
                 runCatching { Uri.parse(expense.receiptPath) }.getOrNull()
             }
             !expense.receiptPath.isNullOrBlank() -> {
-                // Second branch: treat as file path with FileProvider
                 val file = File(expense.receiptPath!!)
                 if (file.exists()) {
                     runCatching {
@@ -164,7 +160,6 @@ private fun ExpensePreviewDialog(expense: Expense, onDismiss: () -> Unit) {
         }
     }
 
-    // Restore exact working image detection
     val isImage: Boolean = remember(previewUri) {
         previewUri?.let { uri ->
             val type = context.contentResolver.getType(uri)
@@ -183,7 +178,7 @@ private fun ExpensePreviewDialog(expense: Expense, onDismiss: () -> Unit) {
         confirmButton = {
             TextButton(onClick = onDismiss) { Text("Close") }
         },
-        title = { Text("Expense Preview") },
+        title = { Text(AppText.expensePreview) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Title: ${expense.title}")
@@ -194,10 +189,10 @@ private fun ExpensePreviewDialog(expense: Expense, onDismiss: () -> Unit) {
 
                 when {
                     previewUri == null -> {
-                        Text("Receipt: Not attached or unavailable")
+                        Text(AppText.receiptMissing)
                     }
                     isImage -> {
-                        Text("Receipt: Attached")
+                        Text(AppText.receiptAttached)
                         ReceiptThumbnail(uri = previewUri)
                         TextButton(onClick = {
                             val openIntent = Intent(Intent.ACTION_VIEW).apply {
@@ -205,7 +200,7 @@ private fun ExpensePreviewDialog(expense: Expense, onDismiss: () -> Unit) {
                                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             }
                             runCatching { context.startActivity(openIntent) }
-                        }) { Text("Open Receipt") }
+                        }) { Text(AppText.openReceipt) }
                     }
                     else -> {
                         val label = context.contentResolver.getType(previewUri)?.uppercase(Locale.ROOT) ?: "FILE"
@@ -229,7 +224,7 @@ private fun ExpensePreviewDialog(expense: Expense, onDismiss: () -> Unit) {
 private fun ReceiptThumbnail(uri: Uri) {
     AsyncImage(
         model = uri,
-        contentDescription = "Receipt preview",
+        contentDescription = AppText.receiptPreview,
         modifier = Modifier
             .size(120.dp)
             .clip(RoundedCornerShape(12.dp)),

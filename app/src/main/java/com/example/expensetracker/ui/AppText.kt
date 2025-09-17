@@ -24,4 +24,5 @@ object AppText {
     const val receiptMissing = "Receipt: Not attached or unavailable"
     const val openReceipt = "Open Receipt"
     const val close = "Close"
+    const val receiptPreview = "Receipt preview"
 }
