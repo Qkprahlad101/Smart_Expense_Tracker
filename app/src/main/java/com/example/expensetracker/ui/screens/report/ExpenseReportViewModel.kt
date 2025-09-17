@@ -16,7 +16,8 @@ class ExpenseReportViewModel(private val repository: ExpenseRepository) : ViewMo
     }
 
     fun getCategoryTotals(expenses: List<Expense>): Map<String, Double> {
-        return expenses.groupBy { it.category }
-            .mapValues { it.value.sumOf { e -> e.amount } }
+        return expenses
+            .groupBy { it.category.display }
+            .mapValues { (_, list) -> list.sumOf { e -> e.amount } }
     }
 }

@@ -1,21 +1,17 @@
 package com.example.expensetracker.data.database
 
-import androidx.room.Dao
-import androidx.room.Database
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.PrimaryKey
-import androidx.room.Query
-import androidx.room.RoomDatabase
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import com.example.expensetracker.model.Category
 
 @Entity(tableName = "expenses")
 data class Expense(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val amount: Double,
-    val category: String,
+    val category: Category = Category.default,
     val notes: String? = null,
+    val receiptUri: String? = null,
     val receiptPath: String? = null,
     val date: Long = System.currentTimeMillis()
 )
@@ -36,6 +32,7 @@ interface ExpenseDao {
 }
 
 @Database(entities = [Expense::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class ExpenseDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
 }

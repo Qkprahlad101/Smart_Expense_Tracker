@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.data.database.Expense
 import com.example.expensetracker.data.repository.ExpenseRepository
+import com.example.expensetracker.model.Category
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -15,7 +16,7 @@ class ExpenseEntryViewModel(private val repository: ExpenseRepository) : ViewMod
     fun addExpense(title: String, amount: Double, category: String, notes: String?, receipt: String?) {
         if (title.isBlank() || amount <= 0) return
         viewModelScope.launch {
-            repository.addExpense(Expense(title = title, amount = amount, category = category, notes = notes, receiptPath = receipt))
+            repository.addExpense(Expense(title = title, amount = amount, category = Category.fromLabel(category), notes = notes, receiptPath = receipt))
         }
     }
 }

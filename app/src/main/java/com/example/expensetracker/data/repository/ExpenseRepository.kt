@@ -37,9 +37,7 @@ class ExpenseRepository(private val dao: ExpenseDao) {
         return dao.getTotalForDateRange(start, end)
     }
 
-    fun getAllExpenses(): Flow<List<Expense>> {
-        return dao.getAllExpenses()
-    }
+    fun getAllExpenses(): Flow<List<Expense>> = dao.getAllExpenses()
 
     fun getExpensesForLast7Days(): Flow<List<Expense>> {
         val calendar = Calendar.getInstance()
