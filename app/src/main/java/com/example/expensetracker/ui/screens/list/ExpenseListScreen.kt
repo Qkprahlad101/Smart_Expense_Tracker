@@ -2,6 +2,9 @@ package com.example.expensetracker.ui.screens.list
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,14 +18,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.expensetracker.data.database.Expense
+import com.example.expensetracker.model.Category
 import com.example.expensetracker.model.DatePreset
 import com.example.expensetracker.ui.AppText
 import com.example.expensetracker.ui.components.AppScaffold
@@ -85,7 +92,7 @@ fun ExpenseListScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Card(elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier.fillMaxWidth()) {
                     Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("${AppText.totalCount}: $totalCount", style = MaterialTheme.typography.bodyLarge)
+                        Text("${AppText.totalCount}: $totalCount, ", style = MaterialTheme.typography.bodyLarge)
                         Text("${AppText.totalAmount}: ${CurrencyUtil.rupee(totalAmount)}", style = MaterialTheme.typography.bodyLarge)
                     }
                 }
@@ -95,7 +102,9 @@ fun ExpenseListScreen(navController: NavController) {
                 } else {
                     LazyColumn {
                         grouped.forEach { (key, list) ->
-                            item { Text(key, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(vertical = 8.dp)) }
+                            item {
+                                CategoryHeader(title = key)
+                            }
                             items(list) { expense ->
                                 ExpenseRow(
                                     expense = expense,
@@ -112,7 +121,6 @@ fun ExpenseListScreen(navController: NavController) {
                 }
             }
 
-            // Preview dialog
             selectedExpense?.let { exp ->
                 ExpensePreviewDialog(expense = exp, onDismiss = { selectedExpense = null })
             }
@@ -120,18 +128,71 @@ fun ExpenseListScreen(navController: NavController) {
     )
 }
 
+private fun categoryColors(category: String): Pair<Color, Color> {
+    return when (category) {
+        Category.Staff.display -> Color(0xFFE8F5E9) to Color(0xFF2E7D32) // light green bg, dark green text
+        Category.Travel.display   -> Color(0xFFE3F2FD) to Color(0xFF1565C0) // light blue bg, blue text
+        Category.Food.display    -> Color(0xFFFFF3E0) to Color(0xFFEF6C00) // light orange bg, orange text
+        Category.Utility.display  -> Color(0xFFF3E5F5) to Color(0xFF6A1B9A) // light purple bg, purple text
+        else      -> Color(0xFFF5F5F5) to Color(0xFF424242) // neutral
+    }
+}
+
+@Composable
+private fun CategoryHeader(title: String) {
+    val (bg, fg) = categoryColors(title)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, bottom = 6.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(bg)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+            color = fg
+        )
+    }
+}
+
+
 @Composable
 private fun ExpenseRow(expense: Expense, onClick: () -> Unit) {
+    val (bg, fg) = categoryColors(expense.category.display)
+
+    Log.d("ExpenseRow", "bg: $bg, fg: $fg, Expense: $expense")
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    val alpha by animateFloatAsState(if (visible) 1f else 0f, label = "rowAlpha")
+    val offsetY by animateDpAsState(if (visible) 0.dp else 8.dp, label = "rowOffset")
+
     Card(
         elevation = CardDefaults.cardElevation(2.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
+            .offset(y = offsetY)
+            .graphicsLayer { this.alpha = alpha }
             .clickable { onClick() }
     ) {
-        Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("${expense.title}: ${CurrencyUtil.rupee(expense.amount)}")
-            Text("(${expense.category})")
+        Row(
+            modifier = Modifier
+                .background(bg)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                "${expense.title}: ${CurrencyUtil.rupee(expense.amount)}",
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                "(${expense.category})",
+                color = fg,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
+            )
         }
     }
 }
