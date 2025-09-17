@@ -91,7 +91,7 @@ fun ExpenseListScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Card(elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier.fillMaxWidth()) {
                     Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Total Count: $totalCount", style = MaterialTheme.typography.bodyLarge)
+                        Text("Total Count: $totalCount,", style = MaterialTheme.typography.bodyLarge)
                         Text("Total Amount: ${CurrencyUtil.rupee(totalAmount)}", style = MaterialTheme.typography.bodyLarge)
                     }
                 }

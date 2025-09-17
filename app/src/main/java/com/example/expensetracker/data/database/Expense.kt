@@ -16,7 +16,7 @@ data class Expense(
     val amount: Double,
     val category: String,
     val notes: String? = null,
-    val receiptPath: String? = null,  // Updated: Stores internal file path as String
+    val receiptPath: String? = null,
     val date: Long = System.currentTimeMillis()
 )
 
