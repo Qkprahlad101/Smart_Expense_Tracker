@@ -54,3 +54,8 @@ This structure promotes reusability and clean code.
 
 Contributions welcome—fork and PR! For issues, open a ticket. 😊
 
+##App Screenshots
+
+<img width="343" height="752" alt="Screenshot 2025-09-18 at 4 02 59 AM" src="https://github.com/user-attachments/assets/a6c7e7b4-511e-4af0-b4ae-36a1aa6564c4" />
+<img width="343" height="752" alt="Screenshot 2025-09-18 at 4 03 04 AM" src="https://github.com/user-attachments/assets/813d8ff4-8c10-4ce9-b874-8067cf95c04a" />
+<img width="343" height="752" alt="Screenshot 2025-09-18 at 4 03 09 AM" src="https://github.com/user-attachments/assets/1b85afc6-38f1-4da4-907f-b61571cc1042" />
