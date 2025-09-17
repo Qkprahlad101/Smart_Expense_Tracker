@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.expensetracker.data.database.Expense
 import com.example.expensetracker.ui.components.AppScaffold  // Your custom AppScaffold
+import com.example.expensetracker.ui.components.CurrencyUtil
 import com.example.expensetracker.ui.components.DropdownMenuBox
 import com.example.expensetracker.ui.navigation.Destinations
 import kotlinx.coroutines.flow.collectLatest
@@ -65,7 +66,7 @@ fun ExpenseListScreen(navController: NavController) {
                 Card(elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier.fillMaxWidth()) {
                     Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text("Total Count: $totalCount", style = MaterialTheme.typography.bodyLarge)
-                        Text("Total Amount: $${totalAmount}", style = MaterialTheme.typography.bodyLarge)
+                        Text("Total Amount: ${CurrencyUtil.rupee(totalAmount)}", style = MaterialTheme.typography.bodyLarge)
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))

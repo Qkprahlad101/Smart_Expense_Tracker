@@ -20,6 +20,7 @@ import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.example.expensetracker.data.database.Expense
 import com.example.expensetracker.ui.components.AppScaffold  // Assuming this is your custom AppScaffold
+import com.example.expensetracker.ui.components.CurrencyUtil
 import com.example.expensetracker.ui.navigation.Destinations
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
@@ -66,9 +67,15 @@ fun ExpenseReportScreen(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Category Totals (Bar Graph):", style = MaterialTheme.typography.titleMedium)
+                categoryTotals.forEach { (cat, total) ->
+                    Text("$cat: ${CurrencyUtil.rupee(total)}")
+                }
                 BarGraph(categoryTotals)
                 Spacer(modifier = Modifier.height(24.dp))
                 Text("Daily Totals (Line Graph):", style = MaterialTheme.typography.titleMedium)
+                categoryTotals.forEach { (cat, total) ->
+                    Text("$cat: ${CurrencyUtil.rupee(total)}")
+                }
                 LineGraph(dailyTotals)
                 Spacer(modifier = Modifier.weight(1f))
                 Button(onClick = {
@@ -87,7 +94,8 @@ fun ExpenseReportScreen(navController: NavController) {
 }
 
 private fun shareReport(context: Context, expenses: List<Expense>) {
-    val csvContent = "Title,Amount,Category\n" + expenses.joinToString("\n") { "${it.title},${it.amount},${it.category}" }
+    val csvContent = "Title,Amount(INR),Category\n" +
+            expenses.joinToString("\n") { "${it.title},${it.amount},${it.category}" }
     val csvFile = File(context.cacheDir, "report.csv")
     csvFile.writeText(csvContent)
     val csvUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", csvFile)

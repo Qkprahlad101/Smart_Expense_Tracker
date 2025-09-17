@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.expensetracker.ui.components.AppScaffold  // Your custom AppScaffold
+import com.example.expensetracker.ui.components.CurrencyUtil
 import com.example.expensetracker.ui.components.DropdownMenuBox
 import com.example.expensetracker.ui.navigation.Destinations
 import kotlinx.coroutines.flow.collectLatest
@@ -71,7 +72,7 @@ fun ExpenseEntryScreen(navController: NavController) {
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 Card(elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier.fillMaxWidth()) {
-                    Text("Total Spent Today: $$totalToday", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.bodyLarge)
+                    Text("Total Spent Today: ${CurrencyUtil.rupee(totalToday)}", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.bodyLarge)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Title") }, modifier = Modifier.fillMaxWidth())
