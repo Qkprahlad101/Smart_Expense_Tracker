@@ -15,6 +15,8 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = androidx.compose.ui.graphics.Color(0xFF6200EE),
     secondary = androidx.compose.ui.graphics.Color(0xFF03DAC6),
+    background = LightGrayBg,
+    surface = LightGrayBg
 )
 
 @Composable

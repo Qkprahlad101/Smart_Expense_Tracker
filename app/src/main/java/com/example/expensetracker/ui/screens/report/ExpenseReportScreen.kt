@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.example.expensetracker.data.database.Expense
-import com.example.expensetracker.ui.components.AppScaffold  // Assuming this is your custom AppScaffold
+import com.example.expensetracker.ui.components.AppScaffold
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
@@ -73,9 +73,9 @@ fun ExpenseReportScreen(navController: NavController) {
 
                 Spacer(Modifier.height(16.dp))
                 Text("Category Totals (Bar Graph):", style = MaterialTheme.typography.titleMedium)
-                CategoryTotalsHeader(categoryTotals)   // <-- new header
+                CategoryTotalsHeader(categoryTotals)
                 Spacer(modifier = Modifier.height(8.dp))
-                BarGraph(categoryTotals)  // keep height inside composable
+                BarGraph(categoryTotals)
                 Spacer(Modifier.height(24.dp))
 
                 Button(
