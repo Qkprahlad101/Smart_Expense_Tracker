@@ -3,10 +3,14 @@ package com.example.expensetracker.ui.screens.list
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,6 +40,14 @@ import com.example.expensetracker.ui.components.AppScaffold
 import com.example.expensetracker.ui.components.CurrencyUtil
 import com.example.expensetracker.ui.components.DropdownMenuBox
 import com.example.expensetracker.ui.navigation.Destinations
+import com.example.expensetracker.ui.theme.CategoryFoodDark
+import com.example.expensetracker.ui.theme.CategoryFoodLight
+import com.example.expensetracker.ui.theme.CategoryOtherDark
+import com.example.expensetracker.ui.theme.CategoryOtherLight
+import com.example.expensetracker.ui.theme.CategoryTravelLight
+import com.example.expensetracker.ui.theme.CategoryUtilityDark
+import com.example.expensetracker.ui.theme.CategoryUtilityLight
+import com.example.expensetracker.ui.theme.TravelDark
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
@@ -50,19 +62,14 @@ fun ExpenseListScreen(navController: NavController) {
     var groupBy by remember { mutableStateOf(AppText.byCategory) }
     var datePreset by remember { mutableStateOf(DatePreset.Today.label) }
     var expenses by remember { mutableStateOf<List<Expense>>(emptyList()) }
-
-    // State for preview dialog
     var selectedExpense by remember { mutableStateOf<Expense?>(null) }
-
     val (start, end) = viewModel.getDateRange(datePreset)
     LaunchedEffect(datePreset, groupBy) {
         viewModel.getExpenses(groupBy == AppText.byCategory, start, end).collectLatest { expenses = it }
     }
-
     val grouped = viewModel.getGroupedExpenses(groupBy == AppText.byCategory, expenses)
     val totalCount = expenses.size
     val totalAmount = expenses.sumOf { it.amount }
-
     AppScaffold(
         topBar = {
             TopAppBar(
@@ -102,9 +109,7 @@ fun ExpenseListScreen(navController: NavController) {
                 } else {
                     LazyColumn {
                         grouped.forEach { (key, list) ->
-                            item {
-                                CategoryHeader(title = key)
-                            }
+                            item { CategoryHeader(title = key) }
                             items(list) { expense ->
                                 ExpenseRow(
                                     expense = expense,
@@ -120,7 +125,6 @@ fun ExpenseListScreen(navController: NavController) {
                     Button(onClick = { navController.navigate(Destinations.REPORT) }) { Text(AppText.viewReport) }
                 }
             }
-
             selectedExpense?.let { exp ->
                 ExpensePreviewDialog(expense = exp, onDismiss = { selectedExpense = null })
             }
@@ -128,70 +132,74 @@ fun ExpenseListScreen(navController: NavController) {
     )
 }
 
-private fun categoryColors(category: String): Pair<Color, Color> {
-    return when (category) {
-        Category.Staff.display -> Color(0xFFE8F5E9) to Color(0xFF2E7D32) // light green bg, dark green text
-        Category.Travel.display   -> Color(0xFFE3F2FD) to Color(0xFF1565C0) // light blue bg, blue text
-        Category.Food.display    -> Color(0xFFFFF3E0) to Color(0xFFEF6C00) // light orange bg, orange text
-        Category.Utility.display  -> Color(0xFFF3E5F5) to Color(0xFF6A1B9A) // light purple bg, purple text
-        else      -> Color(0xFFF5F5F5) to Color(0xFF424242) // neutral
-    }
-}
-
 @Composable
 private fun CategoryHeader(title: String) {
-    val (bg, fg) = categoryColors(title)
-    Row(
+    val isDarkTheme = isSystemInDarkTheme()
+    val (bg, fg) = when (title) {
+        Category.Food.display -> if (isDarkTheme) CategoryFoodDark to Color.White else CategoryFoodLight to Color.Black
+        Category.Travel.display -> if (isDarkTheme) TravelDark to Color.White else CategoryTravelLight to Color.Black
+        Category.Utility.display -> if (isDarkTheme) CategoryUtilityDark to Color.White else CategoryUtilityLight to Color.Black
+        else -> if (isDarkTheme) CategoryOtherDark to Color.White else CategoryOtherLight to Color.Black
+    }
+    
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp, bottom = 6.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(bg)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 4.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(8.dp)
     ) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-            color = fg
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
     }
 }
 
-
 @Composable
 private fun ExpenseRow(expense: Expense, onClick: () -> Unit) {
-    val (bg, fg) = categoryColors(expense.category.display)
-
-    Log.d("ExpenseRow", "bg: $bg, fg: $fg, Expense: $expense")
-    var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { visible = true }
-    val alpha by animateFloatAsState(if (visible) 1f else 0f, label = "rowAlpha")
-    val offsetY by animateDpAsState(if (visible) 0.dp else 8.dp, label = "rowOffset")
+    val isDarkTheme = isSystemInDarkTheme()
+    val (bg, fg) = when (expense.category) {
+        Category.Food -> if (isDarkTheme) CategoryFoodDark.copy(alpha = 0.2f) to CategoryFoodLight 
+                        else CategoryFoodLight.copy(alpha = 0.6f) to Color.Black
+        Category.Travel -> if (isDarkTheme) TravelDark.copy(alpha = 0.2f) to CategoryTravelLight 
+                          else CategoryTravelLight.copy(alpha = 0.6f) to Color.Black
+        Category.Utility -> if (isDarkTheme) CategoryUtilityDark.copy(alpha = 0.2f) to CategoryUtilityLight 
+                          else CategoryUtilityLight.copy(alpha = 0.6f) to Color.Black
+        else -> if (isDarkTheme) CategoryOtherDark.copy(alpha = 0.2f) to Color.LightGray 
+               else CategoryOtherLight.copy(alpha = 0.6f) to Color.DarkGray
+    }
 
     Card(
-        elevation = CardDefaults.cardElevation(2.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .offset(y = offsetY)
-            .graphicsLayer { this.alpha = alpha }
-            .clickable { onClick() }
+            .padding(vertical = 4.dp, horizontal = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
-                .background(bg)
+                .fillMaxWidth()
+                .background(bg.copy(alpha = 0.3f))
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "${expense.title}: ${CurrencyUtil.rupee(expense.amount)}",
+                text = "${expense.title}: ${CurrencyUtil.rupee(expense.amount)}",
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                "(${expense.category})",
+                text = "(${expense.category.display})",
+                style = MaterialTheme.typography.bodyMedium,
                 color = fg,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium)
+                fontWeight = FontWeight.Medium
             )
         }
     }

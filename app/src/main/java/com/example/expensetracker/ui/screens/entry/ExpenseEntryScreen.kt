@@ -3,7 +3,6 @@ package com.example.expensetracker.ui.screens.entry
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -18,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.expensetracker.ui.components.AppScaffold  // Your custom AppScaffold
+import com.example.expensetracker.ui.components.AppScaffold
 import com.example.expensetracker.ui.components.CurrencyUtil
 import com.example.expensetracker.ui.components.DropdownMenuBox
 import com.example.expensetracker.ui.navigation.Destinations
